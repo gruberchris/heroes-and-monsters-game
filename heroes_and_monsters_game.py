@@ -190,7 +190,7 @@ class HeroesAndMonstersGame:
             return "A {} has appeared!".format(self.monster)
 
     def main(self):
-        print(emoji.emojize("Welcome to the The Hero & Monsters game. :skull:"))
+        print(emoji.emojize("Welcome to the Heroes & Monsters game. :skull:"))
         print(emoji.emojize("This land is dark and full of monsters. :waxing_crescent_moon:"))
         print(emoji.emojize("Who can say how many monsters you will encounter. :thinking_face:"))
         print(emoji.emojize("You are the hero and you must kill all the monsters. :crossed_swords:\n"))
