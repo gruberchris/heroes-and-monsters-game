@@ -7,3 +7,7 @@ You are a hero, and you are on a quest to defeat the monsters that are terrorizi
 ## How to Play
 
 After cloning the repository, run `pip3 install -r requirements.txt` to install the required modules. Then, run `python3 heroes_and_monsters_game.py` to start the game.
+
+## How to Play Using Docker
+
+After cloning the repository, run `docker build -t heroes-and-monsters .` to build the docker image. Then, run `docker run -it heroes-and-monsters` to start the game.
