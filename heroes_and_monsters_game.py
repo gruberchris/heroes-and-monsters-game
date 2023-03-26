@@ -53,7 +53,7 @@ class Goblin(Monster):
 
 class Troll(Monster):
     def __init__(self):
-        super(Troll, self).__init__(name="Troll", health=10, damage=1, attack_chance=.8, special_attack_chance=.6)
+        super(Troll, self).__init__(name="Troll", health=10, damage=1, attack_chance=.8, special_attack_chance=.7)
 
     def attack(self, other):
         return super(Troll, self).attack(other)
@@ -75,7 +75,7 @@ class Troll(Monster):
 
 class Orc(Monster):
     def __init__(self):
-        super(Orc, self).__init__(name="Orc", health=12, damage=2, attack_chance=.6, special_attack_chance=.4)
+        super(Orc, self).__init__(name="Orc", health=12, damage=2, attack_chance=.6, special_attack_chance=.3)
 
     def attack(self, other):
         return super(Orc, self).attack(other)
