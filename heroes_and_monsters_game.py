@@ -117,6 +117,7 @@ class Hero:
         self.attack_chance = .8
         self.score = 0
         self.turns = -1
+        self.bonus_healing_chance = .3
 
     def __str__(self):
         return self.name
@@ -135,14 +136,23 @@ class Hero:
         return attack_damage
 
     def heal(self):
-        healing_amount = random.randint(1, self.health_cap)
+        # The hero can only heal up to half of their health cap
+        healing_amount = random.randint(1, self.health_cap // 2)
+        bonus_heal_amount = 0
 
-        if self.health + healing_amount > self.health_cap:
-            self.health = self.health_cap
-            print(emoji.emojize("You restored your health! :red_heart:\n"))
+        if random.random() <= bonus_heal_amount:
+            bonus_heal_amount = random.randint(1, self.health_cap // 2)
+
+        if self.health < self.health_cap:
+            heal_amount = min(healing_amount + bonus_heal_amount, self.health_cap - self.health)
+            self.health += heal_amount
+
+            if bonus_heal_amount > 0:
+                print(emoji.emojize("You healed yourself exceptionally well for {} health! :red_heart: :red_heart:\n").format(heal_amount))
+            else:
+                print(emoji.emojize("You healed yourself for {} health! :red_heart:\n").format(healing_amount))
         else:
-            self.health += healing_amount
-            print(emoji.emojize("You healed yourself for {} health! :red_heart:\n").format(healing_amount))
+            print(emoji.emojize("You have no wounds to heal. :confounded_face:\n"))
 
     def _special_attack(self, other):
         pass
