@@ -58,12 +58,12 @@ class Troll(Monster):
 
     def attack(self, other):
         health_regen_rate = random.randint(1, 2)
-        self.health += health_regen_rate
-        1
-        if self.health > self.health_cap:
-            self.health = self.health_cap
 
-        print(emoji.emojize("The Troll regenerates {} health! :red_heart:").format(health_regen_rate))
+        if self.health < self.health_cap:
+            heal_amount = min(health_regen_rate, self.health_cap - self.health)
+            self.health += heal_amount
+            print(emoji.emojize("The Troll regenerates {} health! :red_heart:").format(heal_amount))
+
         return super(Troll, self).attack(other)
 
     def special_attack(self, other):
@@ -96,13 +96,15 @@ class Vampire(Monster):
 
     def special_attack(self, other):
         special_attack_damage = self.damage
-        self.health += special_attack_damage
+        heal_amount = self.damage
 
-        if self.health > self.health_cap:
-            self.health = self.health_cap
+        if self.health < self.health_cap:
+            heal_amount = min(heal_amount, self.health_cap - self.health)
+            self.health += heal_amount
+            print(emoji.emojize("The Vampire adds {} to it's health! :red_heart:").format(heal_amount))
 
-        print(emoji.emojize("The Vampire adds {} to it's health! :red_heart:").format(special_attack_damage))
         print(emoji.emojize("The Vampire grows stronger as your wounds open up! :face_screaming_in_fear:"))
+
         return special_attack_damage
 
 
