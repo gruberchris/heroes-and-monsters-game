@@ -222,6 +222,8 @@ class HeroesAndMonstersGame:
             return emoji.emojize("A {} has appeared! :goblin:").format(self.monster)
         elif type(self.monster) is Orc:
             return emoji.emojize("An {} has appeared! :ogre:").format(self.monster)
+        elif type(self.monster) is Vampire:
+            return emoji.emojize("A {} has appeared! :vampire:").format(self.monster)
         else:
             return "A {} has appeared!".format(self.monster)
 
