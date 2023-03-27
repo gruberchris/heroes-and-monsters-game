@@ -53,23 +53,23 @@ class Goblin(Monster):
 
 class Troll(Monster):
     def __init__(self):
-        super(Troll, self).__init__(name="Troll", health=10, damage=1, attack_chance=.8, special_attack_chance=.7)
+        super(Troll, self).__init__(name="Troll", health=10, damage=1, attack_chance=.8, special_attack_chance=.5)
+        self.health_cap = self.health
 
     def attack(self, other):
+        health_regen_rate = random.randint(1, 2)
+        self.health += health_regen_rate
+        1
+        if self.health > self.health_cap:
+            self.health = self.health_cap
+
+        print(emoji.emojize("The Troll regenerates {} health! :red_heart:").format(health_regen_rate))
         return super(Troll, self).attack(other)
 
     def special_attack(self, other):
-        health_regen_rate = random.randint(1, 3)
-        self.health += health_regen_rate
-        print(emoji.emojize("The Troll regenerates {} health! :red_heart:").format(health_regen_rate))
-
-        special_attack_damage = 0
-
-        if random.random() <= self.special_attack_chance - .3:
-            special_attack_damage = random.randint(1, 3)
-            emoji_message = emoji.emojize("The Troll does {} bonus damage to you! :pile_of_poo:")
-            print(emoji_message.format(special_attack_damage))
-
+        special_attack_damage = random.randint(1, 3)
+        emoji_message = emoji.emojize("The Troll does {} bonus damage to you! :pile_of_poo:")
+        print(emoji_message.format(special_attack_damage))
         return special_attack_damage
 
 
@@ -83,6 +83,26 @@ class Orc(Monster):
     def special_attack(self, other):
         special_attack_damage = self.damage * 3
         print(emoji.emojize("The Orc does bonus triple damage to you! :face_screaming_in_fear:"))
+        return special_attack_damage
+
+
+class Vampire(Monster):
+    def __init__(self):
+        super(Vampire, self).__init__(name="Vampire", health=15, damage=3, attack_chance=.6, special_attack_chance=.5)
+        self.health_cap = self.health
+
+    def attack(self, other):
+        return super(Vampire, self).attack(other)
+
+    def special_attack(self, other):
+        special_attack_damage = self.damage
+        self.health += special_attack_damage
+
+        if self.health > self.health_cap:
+            self.health = self.health_cap
+
+        print(emoji.emojize("The Vampire adds {} to it's health! :red_heart:").format(special_attack_damage))
+        print(emoji.emojize("The Vampire grows stronger as your wounds open up! :face_screaming_in_fear:"))
         return special_attack_damage
 
 
@@ -128,7 +148,7 @@ class Hero:
 
 class HeroesAndMonstersGame:
     def __init__(self):
-        self.monsters = [Goblin(), Troll(), Orc()]
+        self.monsters = [Goblin(), Troll(), Orc(), Vampire()]
         self.monster = self.get_next_monster()
         self.hero = Hero(name="Hero", health=14, damage=5)
 
@@ -153,7 +173,9 @@ class HeroesAndMonstersGame:
         hero_attack_damage = hero.attack(monster)
 
         if hero_attack_damage > 0:
-            print(emoji.emojize("You attack the {} and landed a mighty blow that did {} damage! :crossed_swords:\n").format(monster, hero_attack_damage))
+            print(emoji.emojize(
+                "You attack the {} and landed a mighty blow that did {} damage! :crossed_swords:\n").format(monster,
+                                                                                                            hero_attack_damage))
         else:
             print(emoji.emojize("You swing, but missed striking the {}. :anguished_face:\n").format(monster))
 
@@ -172,9 +194,11 @@ class HeroesAndMonstersGame:
         monster_damage = monster.attack(hero)
 
         if monster_damage > 0:
-            print(emoji.emojize("The {} attacks you and does {} damage! :crossed_swords:\n").format(monster, monster_damage))
+            print(emoji.emojize("The {} attacks you and does {} damage! :crossed_swords:\n").format(monster,
+                                                                                                    monster_damage))
         else:
-            print(emoji.emojize("The {} attempts to strike you, but missed! :rolling_on_the_floor_laughing:\n").format(monster))
+            print(emoji.emojize("The {} attempts to strike you, but missed! :rolling_on_the_floor_laughing:\n").format(
+                monster))
 
         if not hero.is_alive():
             print(emoji.emojize("The {} killed you! :wilted_flower:\n".format(monster)))
@@ -232,13 +256,17 @@ class HeroesAndMonstersGame:
                 print("Invalid choice {}".format(raw_input))
 
         if self.hero.is_alive() and len(self.monsters) == 0:
-            print(emoji.emojize(":trophy: You have killed all {} monsters and survived {} turns! :trophy:").format(self.hero.score, self.hero.turns))
+            print(emoji.emojize(":trophy: You have killed all {} monsters and survived {} turns! :trophy:").format(
+                self.hero.score, self.hero.turns))
             print(emoji.emojize(":partying_face: Good job! :partying_face:"))
         elif self.hero.is_alive() and len(self.monsters) > 0:
-            print(emoji.emojize("You run away from the monsters after surviving {} turns. :person_running:").format(self.hero.turns))
+            print(emoji.emojize("You run away from the monsters after surviving {} turns. :person_running:").format(
+                self.hero.turns))
             print(emoji.emojize(":rooster: Coward! :hatching_chick:"))
         else:
-            print(emoji.emojize("You survived {} turns and slayed {} monster, but this is where your adventure ends.").format(self.hero.turns, self.hero.score))
+            print(emoji.emojize(
+                "You survived {} turns and slayed {} monster, but this is where your adventure ends.").format(
+                self.hero.turns, self.hero.score))
             print(emoji.emojize(":skull: Game over. :skull:"))
 
 
