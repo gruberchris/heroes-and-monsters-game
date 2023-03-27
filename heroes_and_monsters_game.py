@@ -4,13 +4,15 @@ import emoji as emoji
 
 
 class Monster:
-    def __init__(self, name, health, damage, attack_chance, special_attack_chance):
+    def __init__(self, name, health=0, damage=0, attack_chance=.0, special_attack_chance=.0):
         self.name = name
         self.health = health
         self.damage = damage
-        self.min_damage = 1
         self.attack_chance = attack_chance
         self.special_attack_chance = special_attack_chance
+        self.min_damage = 1
+        self.is_enraged = False
+        self.health_cap = self.health
 
     def __str__(self):
         return self.name
@@ -54,7 +56,6 @@ class Goblin(Monster):
 class Troll(Monster):
     def __init__(self):
         super(Troll, self).__init__(name="Troll", health=10, damage=1, attack_chance=.8, special_attack_chance=.5)
-        self.health_cap = self.health
 
     def attack(self, other):
         health_regen_rate = random.randint(1, 2)
@@ -89,7 +90,6 @@ class Orc(Monster):
 class Vampire(Monster):
     def __init__(self):
         super(Vampire, self).__init__(name="Vampire", health=15, damage=3, attack_chance=.6, special_attack_chance=.5)
-        self.health_cap = self.health
 
     def attack(self, other):
         return super(Vampire, self).attack(other)
@@ -105,6 +105,31 @@ class Vampire(Monster):
 
         print(emoji.emojize("The Vampire grows stronger as your wounds open up! :face_screaming_in_fear:"))
 
+        return special_attack_damage
+
+
+class HillGiant(Monster):
+    def __init__(self):
+        super(HillGiant, self).__init__(name="Hill Giant", health=20, damage=4, attack_chance=.2,
+                                        special_attack_chance=.05)
+
+    def attack(self, other):
+        if self.health <= self.health_cap * .3 and not self.is_enraged:
+            self.is_enraged = True
+            self.attack_chance = .9
+            self.special_attack_chance = .15
+            print(emoji.emojize("The Hill Giant is enraged! :enraged_face:"))
+            self.name = "Enraged Hill Giant"
+
+        return super(HillGiant, self).attack(other)
+
+    def special_attack(self, other):
+        special_attack_damage = self.damage
+
+        if self.is_enraged:
+            special_attack_damage = int(self.damage * 1.5)
+
+        print(emoji.emojize("The {} smashes his fist into your face and does {} bonus damage to you! :face_with_spiral_eyes:").format(self.name, special_attack_damage))
         return special_attack_damage
 
 
@@ -131,6 +156,9 @@ class Hero:
         if random.random() > self.attack_chance:
             return 0
 
+        if other.is_enraged:
+            attack_damage = attack_damage // 2
+
         other.health -= attack_damage
 
         return attack_damage
@@ -140,15 +168,17 @@ class Hero:
         healing_amount = random.randint(1, self.health_cap // 2)
         bonus_heal_amount = 0
 
-        if random.random() <= bonus_heal_amount:
+        if random.random() <= self.bonus_healing_chance:
             bonus_heal_amount = random.randint(1, self.health_cap // 2)
 
         if self.health < self.health_cap:
-            heal_amount = min(healing_amount + bonus_heal_amount, self.health_cap - self.health)
-            self.health += heal_amount
+            healing_amount = min(healing_amount + bonus_heal_amount, self.health_cap - self.health)
+            self.health += healing_amount
 
             if bonus_heal_amount > 0:
-                print(emoji.emojize("You healed yourself exceptionally well for {} health! :red_heart: :red_heart:\n").format(heal_amount))
+                print(emoji.emojize(
+                    "You healed yourself exceptionally well for {} health! :red_heart: :red_heart:\n").format(
+                    healing_amount))
             else:
                 print(emoji.emojize("You healed yourself for {} health! :red_heart:\n").format(healing_amount))
         else:
@@ -160,14 +190,14 @@ class Hero:
 
 class HeroesAndMonstersGame:
     def __init__(self):
-        self.monsters = [Goblin(), Troll(), Orc(), Vampire()]
-        self.monster = self.get_next_monster()
+        self.monsters = []
+        self.monster = None
         self.hero = Hero(name="Hero", health=14, damage=5)
 
     def spawn_monsters(self, num_monsters):
         self.monsters = []
         for i in range(num_monsters):
-            monster = random.choice([Goblin(), Troll(), Orc()])
+            monster = random.choice([Goblin(), Troll(), Orc(), Vampire(), HillGiant()])
             self.monsters.append(monster)
 
     def get_next_monster(self):
@@ -185,9 +215,14 @@ class HeroesAndMonstersGame:
         hero_attack_damage = hero.attack(monster)
 
         if hero_attack_damage > 0:
-            print(emoji.emojize(
-                "You attack the {} and landed a mighty blow that did {} damage! :crossed_swords:\n").format(monster,
-                                                                                                            hero_attack_damage))
+            if monster.is_enraged:
+                print(emoji.emojize(
+                    "You attack the {}, but your blows are reduced to {} damage by it's furious anger! :crossed_swords:\n")
+                      .format(monster, hero_attack_damage))
+            else:
+                print(emoji.emojize(
+                    "You attack the {} and landed a cutting strike that did {} damage! :crossed_swords:\n")
+                      .format(monster, hero_attack_damage))
         else:
             print(emoji.emojize("You swing, but missed striking the {}. :anguished_face:\n").format(monster))
 
@@ -235,6 +270,7 @@ class HeroesAndMonstersGame:
 
         monster_count = random.randint(3, 6)
         self.spawn_monsters(monster_count)
+        self.monster = self.get_next_monster()
         monster_appears_message = self.get_monster_appears_message()
         print(monster_appears_message + "\n")
 
