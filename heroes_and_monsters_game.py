@@ -156,6 +156,7 @@ class HillGiant(Monster):
             special_attack_damage = int(self.damage * 1.5)
 
         print(emoji.emojize(f"The {self.name} smashes his fist into your face and does {special_attack_damage} bonus damage to you! :face_with_spiral_eyes:"))
+
         return special_attack_damage
 
 
@@ -179,9 +180,15 @@ class Hero:
     def attack(self, other):
         attack_damage = random.randint(1, self.damage)
 
+        bonus_damage_chance = .3
+
+        if random.random() < bonus_damage_chance:
+            attack_damage += int(attack_damage * .5)
+
         if random.random() > self.attack_chance:
             return 0
 
+        # Evaluate damage mitigation
         if other.is_enraged:
             attack_damage = attack_damage // 2
 
@@ -216,7 +223,7 @@ class HeroesAndMonstersGame:
     def __init__(self):
         self.monsters = []
         self.monster = None
-        self.hero = Hero(name="Hero", health=14, damage=5)
+        self.hero = Hero(name="Hero", health=15, damage=5)
 
     def spawn_monsters(self, num_monsters):
         self.monsters = []
@@ -225,6 +232,9 @@ class HeroesAndMonstersGame:
             self.monsters.append(monster)
 
     def get_next_monster(self):
+        if not self.monsters:
+            return None
+
         monster = random.choice(self.monsters)
 
         try:
@@ -335,7 +345,7 @@ class HeroesAndMonstersGame:
             print(emoji.emojize(f"You run away from the monsters after surviving {self.hero.turns} turns. :person_running:"))
             print(emoji.emojize(":rooster: Coward! :hatching_chick:"))
         else:
-            print(emoji.emojize(f"You survived {self.hero.turns} turns and slayed {self.hero.score} monsters, but now you meet your end. :skull:"))
+            print(emoji.emojize(f":skull: You survived {self.hero.turns} turns and slayed {self.hero.score} monsters, but now you meet your end. :skull:"))
 
 
 if __name__ == "__main__":
