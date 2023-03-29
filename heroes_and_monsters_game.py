@@ -13,6 +13,7 @@ class Monster:
         self.min_damage = 1
         self.is_enraged = False
         self.health_cap = self.health
+        self.is_rabid = False
 
     def __str__(self):
         return self.name
@@ -24,38 +25,65 @@ class Monster:
         if random.random() > self.attack_chance:
             return 0
 
+        # Weapon attack
         total_damage = random.randint(self.min_damage, self.damage)
+        print(emoji.emojize(f"The {self.name} attacks you with it's weapon, causing {total_damage} damage. :crossed_swords:"))
 
+        # Rabid attack
+        if self.is_rabid:
+            rabid_damage = int(random.randint(self.min_damage, self.damage) * 1.5)
+            total_damage += rabid_damage
+            print(emoji.emojize(f"The {self.name} bites you, causing {rabid_damage} damage! :biohazard:"))
+
+        # Special attack
         if random.random() <= self.special_attack_chance:
-            total_damage += self.special_attack(other)
+            total_damage += self._special_attack(other)
 
+        # Subtract damage from the opponent's health
         other.health -= total_damage
 
         return total_damage
 
-    def special_attack(self, other):
+    def _special_attack(self, other):
         pass
 
     def heal(self, amount):
         self.health += amount
 
+    def _becomes_rabid(self):
+        self.is_rabid = True
+        self.attack_chance = .9
+        self.special_attack_chance = .3
+        print(emoji.emojize(f"The {self.name} turns rabid! :biohazard:"))
+        self.name = f"Rabid {self.name}"
+
 
 class Goblin(Monster):
     def __init__(self):
-        super(Goblin, self).__init__(name="Goblin", health=8, damage=2, attack_chance=.5, special_attack_chance=.6)
+        super(Goblin, self).__init__(name="Goblin", health=10, damage=2, attack_chance=.5, special_attack_chance=.6)
 
     def attack(self, other):
+        rabid_chance = .4
+
+        if random.random() <= rabid_chance and not self.is_rabid:
+            self._becomes_rabid()
+
         return super(Goblin, self).attack(other)
 
-    def special_attack(self, other):
-        special_attack_damage = self.damage * 2
-        print(emoji.emojize("The Goblin does bonus double damage to you! :face_with_spiral_eyes:"))
+    def _special_attack(self, other):
+        special_attack_damage = random.randint(self.min_damage, self.damage)
+
+        if self.is_rabid:
+            special_attack_damage = int(special_attack_damage * 1.5)
+
+        print(emoji.emojize(f"The {self.name} quickly thrusts a dagger into your chest, causing {special_attack_damage} damage. :face_with_spiral_eyes:"))
+
         return special_attack_damage
 
 
 class Troll(Monster):
     def __init__(self):
-        super(Troll, self).__init__(name="Troll", health=10, damage=1, attack_chance=.8, special_attack_chance=.5)
+        super(Troll, self).__init__(name="Troll", health=11, damage=2, attack_chance=.6, special_attack_chance=.5)
 
     def attack(self, other):
         health_regen_rate = random.randint(1, 2)
@@ -67,9 +95,9 @@ class Troll(Monster):
 
         return super(Troll, self).attack(other)
 
-    def special_attack(self, other):
-        special_attack_damage = random.randint(1, 3)
-        print(emoji.emojize(f"The Troll does {special_attack_damage} bonus damage to you! :pile_of_poo:"))
+    def _special_attack(self, other):
+        special_attack_damage = random.randint(self.min_damage, self.damage)
+        print(emoji.emojize(f"The Troll back hands you across your face, causing {special_attack_damage} damage. :face_with_spiral_eyes:"))
         return special_attack_damage
 
 
@@ -80,7 +108,7 @@ class Orc(Monster):
     def attack(self, other):
         return super(Orc, self).attack(other)
 
-    def special_attack(self, other):
+    def _special_attack(self, other):
         special_attack_damage = self.damage * 3
         print(emoji.emojize("The Orc does bonus triple damage to you! :face_screaming_in_fear:"))
         return special_attack_damage
@@ -93,7 +121,7 @@ class Vampire(Monster):
     def attack(self, other):
         return super(Vampire, self).attack(other)
 
-    def special_attack(self, other):
+    def _special_attack(self, other):
         special_attack_damage = self.damage
         heal_amount = self.damage
 
@@ -109,8 +137,7 @@ class Vampire(Monster):
 
 class HillGiant(Monster):
     def __init__(self):
-        super(HillGiant, self).__init__(name="Hill Giant", health=20, damage=4, attack_chance=.2,
-                                        special_attack_chance=.05)
+        super(HillGiant, self).__init__(name="Hill Giant", health=20, damage=4, attack_chance=.4, special_attack_chance=.05)
 
     def attack(self, other):
         if self.health <= self.health_cap * .3 and not self.is_enraged:
@@ -122,7 +149,7 @@ class HillGiant(Monster):
 
         return super(HillGiant, self).attack(other)
 
-    def special_attack(self, other):
+    def _special_attack(self, other):
         special_attack_damage = self.damage
 
         if self.is_enraged:
@@ -234,8 +261,8 @@ class HeroesAndMonstersGame:
         monster = self.monster
         monster_damage = monster.attack(hero)
 
-        if monster_damage > 0:
-            print(emoji.emojize(f"The {monster} attacks you and does {monster_damage} damage! :crossed_swords:\n"))
+        if monster_damage:
+            print()
         else:
             print(emoji.emojize(f"The {monster} attempts to strike you, but missed! :rolling_on_the_floor_laughing:\n"))
 
@@ -283,24 +310,24 @@ class HeroesAndMonstersGame:
             print("> ", end=' ')
 
             try:
-                raw_input = input()
+                selected_action = input()
             except KeyboardInterrupt:
                 print("\n")
                 break
 
-            if raw_input == "1":
+            if selected_action == "1":
                 self.hero_attack()
                 if self.monster is not None:
                     self.monster_attack()
-            elif raw_input == "2":
+            elif selected_action == "2":
                 self.hero.heal()
                 self.monster_attack()
-            elif raw_input == "3":
+            elif selected_action == "3":
                 self.monster_attack()
-            elif raw_input == "4":
+            elif selected_action == "4":
                 break
             else:
-                print(emoji.emojize(f"'{raw_input}' is not a valid choice. :confounded_face:\n"))
+                print(emoji.emojize(f"'{selected_action}' is not a valid choice. :confounded_face:\n"))
 
         if self.hero.is_alive() and len(self.monsters) == 0:
             print(emoji.emojize(f":trophy: You have killed all {self.hero.score} monsters and survived {self.hero.turns} turns! :trophy:"))
