@@ -110,7 +110,7 @@ class Orc(Monster):
 
     def _special_attack(self, other):
         special_attack_damage = self.damage * 3
-        print(emoji.emojize("The Orc does bonus triple damage to you! :face_screaming_in_fear:"))
+        print(emoji.emojize(f"The Orc does {special_attack_damage } bonus triple damage to you! :face_screaming_in_fear:"))
         return special_attack_damage
 
 
