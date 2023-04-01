@@ -63,7 +63,7 @@ class Goblin(Monster):
         super(Goblin, self).__init__(name="Goblin", health=10, damage=2, attack_chance=.5, special_attack_chance=.6)
 
     def attack(self, other):
-        rabid_chance = .4
+        rabid_chance = .3
 
         if random.random() <= rabid_chance and not self.is_rabid:
             self._becomes_rabid()
@@ -130,7 +130,7 @@ class Vampire(Monster):
             self.health += heal_amount
             print(emoji.emojize(f"The Vampire adds {heal_amount} to it's health! :red_heart:"))
 
-        print(emoji.emojize("The Vampire grows stronger as your wounds open up! :face_screaming_in_fear:"))
+        print(emoji.emojize("The Vampire becomes stronger as your wounds open up! :face_screaming_in_fear:"))
 
         return special_attack_damage
 
@@ -340,7 +340,7 @@ class HeroesAndMonstersGame:
                 print(emoji.emojize(f"'{selected_action}' is not a valid choice. :confounded_face:\n"))
 
         if self.hero.is_alive() and len(self.monsters) == 0:
-            print(emoji.emojize(f":trophy: You have killed all {self.hero.score} monsters and survived {self.hero.turns} turns! :trophy:"))
+            print(emoji.emojize(f":trophy: You killed all {self.hero.score} monsters and survived {self.hero.turns} turns! :trophy:"))
         elif self.hero.is_alive() and len(self.monsters) > 0:
             print(emoji.emojize(f"You run away from the monsters after surviving {self.hero.turns} turns. :person_running:"))
             print(emoji.emojize(":rooster: Coward! :hatching_chick:"))
